@@ -1,0 +1,101 @@
+.dashboard .weather .title {
+    text-align: center;
+    width: 100%;
+    font-size: var(--lumo-font-size-m);
+}
+
+.dashboard .weather .high {
+    text-align: center;
+    width: 100%;
+    font-size: var(--lumo-font-size-xl);
+}
+
+.dashboard .weather .low {
+    text-align: center;
+    width: 100%;
+    font-size: var(--lumo-font-size-l);
+}
+
+.dashboard .weather .idag .high {
+    font-size: var(--lumo-font-size-xxl);
+}
+
+.dashboard .weather .idag .low {
+    font-size: var(--lumo-font-size-xl);
+}
+
+.dashboard .weather .icon {
+    width: 100%;
+    background: no-repeat center center;
+    background-size: 70%;
+    /*background-image: url(https://cdn4.iconfinder.com/data/icons/weather-line-set/24/icn-weather-scattered-showers-512.png);*/
+}
+
+.dashboard .weather .icon.clear-day {
+    background-image: url(../images/weather/clear-day.svg);
+}
+
+.dashboard .weather .icon.clear-night {
+    background-image: url(../images/weather/clear-night.svg);
+}
+
+.dashboard .weather .icon.fog {
+    background-image: url(../images/weather/fog.svg);
+}
+
+.dashboard .weather .icon.hail {
+    background-image: url(../images/weather/hail.svg);
+}
+
+.dashboard .weather .icon.partly-cloudy-day {
+    background-image: url(../images/weather/partly-cloudy-day.svg);
+}
+
+.dashboard .weather .icon.partly-cloudy-night {
+    background-image: url(../images/weather/partly-cloudy-night.svg);
+}
+
+.dashboard .weather .icon.rain {
+    background-image: url(../images/weather/rain.svg);
+}
+
+.dashboard .weather .icon.sleet {
+    background-image: url(../images/weather/sleet.svg);
+}
+
+.dashboard .weather .icon.snow {
+    background-image: url(../images/weather/snow.svg);
+}
+
+.dashboard .weather .icon.thunderstorms {
+    background-image: url(../images/weather/thunderstorms.svg);
+}
+
+.dashboard .weather .icon.tornado {
+    background-image: url(../images/weather/tornado.svg);
+}
+
+.dashboard .weather .icon.wind {
+    background-image: url(../images/weather/wind.svg);
+}
+
+.dashboard .weather .day0 {
+    background-color: var(--lumo-primary-color);
+}
+
+.dashboard .weather .day1 {
+    /*background-color: var(--lumo-primary-color-50pct);*/
+    background-color: hsla(214, 90%, 52%, 0.80);
+}
+
+.dashboard .weather .day2 {
+    background-color: hsla(214, 90%, 52%, 0.60);
+}
+
+.dashboard .weather .day3 {
+    background-color: hsla(214, 90%, 52%, 0.40);
+}
+
+.dashboard .weather .day4 {
+    background-color: hsla(214, 90%, 52%, 0.20);
+}

@@ -1,0 +1,19 @@
+.dashboard .calendar .petter {
+    border-left: #4754b2 8px solid;
+}
+
+.dashboard .calendar .anki {
+    border-left: #cd8274 8px solid;
+}
+
+.dashboard .calendar .linn {
+    border-left: #7a37a7 8px solid;
+}
+
+.dashboard .calendar .isak {
+    border-left: #6fb079 8px solid;
+}
+
+.dashboard .calendar .other {
+    border-left: #4a7c46 8px solid;
+}
