@@ -17,8 +17,8 @@ public final class DateUtils {
         return getDay(date, false);
     }
 
-    public static String getDay(LocalDate date, boolean useNameExceptoToday) {
-        return getDay(date, useNameExceptoToday, "EEEE d/LLL");
+    public static String getDay(LocalDate date, boolean useNameExcepToday) {
+        return getDay(date, useNameExcepToday, "EEEE d/LLL");
     }
 
     public static String getDay(LocalDate date, boolean useDayNameExceptToday, String fallbackFormat) {

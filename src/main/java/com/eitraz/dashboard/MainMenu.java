@@ -29,7 +29,9 @@ public class MainMenu extends FlexLayout implements AfterNavigationObserver {
         menu.setClassName("items");
 
         addMenuItem(Constants.PAGE_ROOT, VaadinIcon.HOME);
+        addMenuItem(Constants.PAGE_CALENDAR, VaadinIcon.CALENDAR);
         addMenuItem(Constants.PAGE_WEATHER, VaadinIcon.SUN_O);
+        addMenuItem(Constants.PAGE_ECONOMY, VaadinIcon.DOLLAR);
 
         menu.addSelectedChangeListener(event -> {
             int index = menu.getSelectedIndex();

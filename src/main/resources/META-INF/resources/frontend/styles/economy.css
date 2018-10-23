@@ -1,0 +1,38 @@
+.economy.login {
+    margin: auto;
+}
+
+.economy .loginButtons {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.economy .accountsList {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.economy.accounts {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.economy .account {
+    width: 100%;
+    padding: var(--lumo-space-s);
+    border-radius: var(--lumo-border-radius);
+    background: var(--lumo-shade-70pct);
+    font-size: var(--lumo-font-size-xl);
+    border-left: #4754b2 8px solid;
+}
+
+.economy .account .name {
+    width: 50%;
+    padding-left: 10px;
+}
+
+.economy .account .balance {
+    width: 50%;
+    text-align: right;
+    padding-right: 10px;
+}

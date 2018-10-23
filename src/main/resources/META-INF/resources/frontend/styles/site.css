@@ -53,7 +53,13 @@ body {
     bottom: 0;
     width: 100%;
     background: var(--lumo-shade-70pct);
+    /*background: no-repeat center center;*/
+    /*background-size: 100% 100%;*/
+    /*opacity: 0.75;*/
+    /*background-image: url(../images/outside.png);*/
 }
+
+/*http://192.168.1.30:3000/render/d-solo/UHNgBxbik/temperature-graphs?panelId=2&orgId=1&tab=legend&from=1540256851193&to=1540278451193&width=1000&height=200&tz=UTC%2B02%3A00*/
 
 .dashboard .container .bottom .title {
     width: 50%;
@@ -67,7 +73,8 @@ body {
 /*Temperature*/
 
 .dashboard .ute {
-    background-image: url(https://media-cdn.tripadvisor.com/media/photo-s/0b/75/f3/32/the-snagov-forest-outside.jpg);
+    /*background-image: url(https://media-cdn.tripadvisor.com/media/photo-s/0b/75/f3/32/the-snagov-forest-outside.jpg);*/
+    background-image: url(../images/outside.jpg);
 }
 
 .dashboard .vardagsrum {
@@ -100,7 +107,7 @@ body {
     font-size: var(--lumo-font-size-l);
 }
 
-.dashboard .calendar .entry {
+.calendar .entry {
     width: 100%;
     padding: var(--lumo-space-s);
     border-radius: var(--lumo-border-radius);

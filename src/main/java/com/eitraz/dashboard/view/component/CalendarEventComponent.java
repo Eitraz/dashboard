@@ -15,26 +15,34 @@ import java.time.LocalDateTime;
 import static com.eitraz.dashboard.util.DateUtils.EUROPE_STOCKHOLM;
 import static com.eitraz.dashboard.util.DateUtils.getTime;
 
-public class CalendarEventComponent extends HorizontalLayout {
+class CalendarEventComponent extends HorizontalLayout {
     private GoogleCalendarService.CalendarEvent calendarEvent;
     private final Label label;
+    private final boolean displayDate;
+    private final int maxWidth;
 
-    public CalendarEventComponent(GoogleCalendarService.CalendarEvent calendarEvent) {
+    CalendarEventComponent(GoogleCalendarService.CalendarEvent calendarEvent) {
+        this(calendarEvent, true, 72);
+    }
+
+    CalendarEventComponent(GoogleCalendarService.CalendarEvent calendarEvent, boolean displayDate, int maxWidth) {
         this.calendarEvent = calendarEvent;
+        this.displayDate = displayDate;
+        this.maxWidth = maxWidth;
 
         label = new Label();
         add(label);
     }
 
-    public GoogleCalendarService.CalendarEvent getCalendarEvent() {
+    GoogleCalendarService.CalendarEvent getCalendarEvent() {
         return calendarEvent;
     }
 
-    public void setCalendarEvent(GoogleCalendarService.CalendarEvent calendarEvent) {
+    void setCalendarEvent(GoogleCalendarService.CalendarEvent calendarEvent) {
         this.calendarEvent = calendarEvent;
     }
 
-    public void update() {
+    void update() {
         String calendarId = calendarEvent.getCalendarId();
         Event event = calendarEvent.getEvent();
 
@@ -51,7 +59,7 @@ public class CalendarEventComponent extends HorizontalLayout {
 
         // Date only
         if (startTime.isDateOnly()) {
-            time = DateUtils.getDay(date);
+            time = displayDate ? (DateUtils.getDay(date) + " - ") : "";
         }
         // Date and time
         else {
@@ -70,8 +78,15 @@ public class CalendarEventComponent extends HorizontalLayout {
                 endDateTime = null;
             }
 
-
-            time = DateUtils.getDay(date) + ", " + getTime(startDateTime, endDateTime);
+            // With date
+            if (displayDate) {
+                time = DateUtils.getDay(date) + ", " + getTime(startDateTime, endDateTime);
+            }
+            // Without date
+            else {
+                time = getTime(startDateTime, endDateTime);
+            }
+            time += " - ";
         }
 
         // Category
@@ -86,6 +101,6 @@ public class CalendarEventComponent extends HorizontalLayout {
         addClassNames(category);
 
         // Update text
-        label.setText(StringUtils.abbreviate(time + " - " + summary, 72));
+        label.setText(StringUtils.abbreviate(time + summary, maxWidth));
     }
 }

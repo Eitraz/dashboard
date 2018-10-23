@@ -52,6 +52,16 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
@@ -90,6 +100,13 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.3.1</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.soshibby/swedbank -->
+        <dependency>
+            <groupId>com.github.soshibby</groupId>
+            <artifactId>swedbank</artifactId>
+            <version>1.2.1</version>
         </dependency>
 
     </dependencies>

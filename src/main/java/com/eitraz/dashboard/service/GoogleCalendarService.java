@@ -50,9 +50,6 @@ public class GoogleCalendarService extends EventPublisher<List<GoogleCalendarSer
     @Value("${google.calendar.ids}")
     private String calendarIds;
 
-    @Value("${google.calendar.numberOfEvents}")
-    private Integer numberOfEvents;
-
     @Value("${google.calendar.updateDelayInMinutes}")
     private Integer updateDelayInMinutes;
 
@@ -90,10 +87,9 @@ public class GoogleCalendarService extends EventPublisher<List<GoogleCalendarSer
 
         try {
             lastCalendarEvents = calendarIdList.stream()
-                                               .map(calendarId -> getEvents(calendarId, numberOfEvents))
+                                               .map(this::getEvents)
                                                .flatMap(Collection::stream)
                                                .sorted(Comparator.comparingLong(o -> o.getStartTime().getValue()))
-                                               .limit(numberOfEvents)
                                                .collect(Collectors.toList());
 
             logger.info("Calendar events updated");
@@ -106,11 +102,11 @@ public class GoogleCalendarService extends EventPublisher<List<GoogleCalendarSer
     /**
      * Get calendar events for calendarId
      */
-    private synchronized List<CalendarEvent> getEvents(String calendarId, int maxResults) {
+    private synchronized List<CalendarEvent> getEvents(String calendarId) {
         try {
             return service.events()
                           .list(calendarId)
-                          .setMaxResults(maxResults)
+                          .setMaxResults(20)
                           .setTimeMin(new DateTime(System.currentTimeMillis()))
                           .setOrderBy("startTime")
                           .setSingleEvents(true)
