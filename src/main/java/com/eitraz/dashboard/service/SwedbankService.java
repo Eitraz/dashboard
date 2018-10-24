@@ -7,6 +7,7 @@ import com.github.soshibby.swedbank.types.AccountList;
 import com.github.soshibby.swedbank.types.TransactionAccount;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +60,12 @@ public class SwedbankService {
                                 .replace("-", "_")
                                 .toLowerCase();
 
+                        String id = DigestUtils.md5Hex(account.getFullyFormattedNumber());
+
                         registry.gauge(
                                 "economy_account",
                                 Arrays.asList(
-                                        Tag.of("id", account.getId()),
+                                        Tag.of("id", id),
                                         Tag.of("tag", tag),
                                         Tag.of("name", account.getName()),
                                         Tag.of("type", getAccountType(accountList, account))),
