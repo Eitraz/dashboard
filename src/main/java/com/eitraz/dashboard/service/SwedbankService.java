@@ -38,6 +38,7 @@ public class SwedbankService {
         // Update metrics at a scheduled interval
         scheduledExecutorService.scheduleWithFixedDelay(() -> {
             synchronized (registryCache) {
+                logger.info("Registry cache size: " + registryCache.size());
                 registryCache.forEach(entry -> registry.gauge(entry.getName(), entry.getTags(), entry.getValue()));
             }
         }, 1, 1, TimeUnit.MINUTES);
@@ -83,6 +84,8 @@ public class SwedbankService {
                                         account.getBalance());
                             })
                             .collect(Collectors.toList());
+
+                    logger.info("New registry cache size: " + newRegistryCache.size());
 
                     // Update metrics registry cache
                     synchronized (registryCache) {
