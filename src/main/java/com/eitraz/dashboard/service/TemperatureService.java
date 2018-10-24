@@ -62,12 +62,6 @@ public class TemperatureService {
                 .keySet().stream()
                 .map(id -> mqtt.subscribe(getTopicName(id), value -> publish(id, value, true)))
                 .collect(Collectors.toList());
-
-        publishCache();
-    }
-
-    private synchronized void publishCache() {
-        cache.forEach((key, value) -> publish(key, value, false));
     }
 
     @SuppressWarnings("CodeBlock2Expr")
@@ -99,10 +93,16 @@ public class TemperatureService {
         }
     }
 
+    private synchronized void publishCache() {
+        cache.forEach((key, value) -> publish(key, value, false));
+    }
+
     public TemperatureListenerRegistration registerTemperatureListener(String name, Consumer<Double> temperatureConsumer) {
         List<Consumer<Double>> listenerList = listeners.getOrDefault(name, new ArrayList<>());
         listenerList.add(temperatureConsumer);
         listeners.put(name, listenerList);
+
+        publishCache();
 
         return () -> {
             synchronized (TemperatureListenerRegistration.class) {
