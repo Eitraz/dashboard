@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import tk.plogitech.darksky.forecast.model.DailyDataPoint;
 import tk.plogitech.darksky.forecast.model.Forecast;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +39,22 @@ public class DashboardWeatherComponent extends HorizontalLayout {
         this.numberOfDays = 4;
 
         addClassNames("container", "weather");
+
+        days = new ArrayList<>();
+
+        // Create components
+        for (int i = 0; i < numberOfDays; i++) {
+            days.add(new WeatherEntryComponent(i));
+        }
+
+        // Add to layout
+        add(days.toArray(new Component[]{}));
+        setFlexGrow(2.5, days.get(0));
+        setFlexGrow(2, days.get(1));
+
+        for (int i = 2; i < days.size(); i++) {
+            setFlexGrow(1, days.get(i));
+        }
     }
 
     @Override
@@ -62,31 +78,14 @@ public class DashboardWeatherComponent extends HorizontalLayout {
 
         List<DailyDataPoint> dailyDataPoints = forecast.getDaily().getData();
 
-        // First update or new day
-        if (days.isEmpty() || !days.get(0).getDate().isEqual(LocalDate.now())) {
-            days = new ArrayList<>();
-            for (int i = 0; i < numberOfDays; i++) {
-                days.add(new WeatherEntryComponent(i, dailyDataPoints.get(i)));
-            }
+        // Show tomorrow forecast after a specific time of day
+        int offset = LocalDateTime.now().isAfter(LocalDateTime.now().withHour(17).withMinute(30)) ? 1 : 0;
 
-            ui.access(() -> {
-                logger.debug("Updating weather UI (new day)");
-                removeAll();
-                add(days.toArray(new Component[]{}));
-                setFlexGrow(days.size(), days.get(0));
-                for (int i = 1; i < days.size(); i++) {
-                    setFlexGrow(1, days.get(i));
-                }
-            });
-        }
-        // Update days
-        else {
-            ui.access(() -> {
-                logger.debug("Updating weather UI");
-                for (int i = 0; i < numberOfDays; i++) {
-                    days.get(i).update(dailyDataPoints.get(i));
-                }
-            });
-        }
+        ui.access(() -> {
+            logger.debug("Updating weather UI");
+            for (int i = 0; i < numberOfDays; i++) {
+                days.get(i).update(dailyDataPoints.get(i + offset));
+            }
+        });
     }
 }

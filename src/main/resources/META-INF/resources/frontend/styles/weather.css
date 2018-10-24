@@ -33,7 +33,7 @@
 .dashboard .weather .icon {
     width: 100%;
     background: no-repeat center center;
-    background-size: 65%;
+    background-size: 60%;
     /*background-image: url(https://cdn4.iconfinder.com/data/icons/weather-line-set/24/icn-weather-scattered-showers-512.png);*/
 }
 

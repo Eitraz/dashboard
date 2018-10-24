@@ -11,30 +11,30 @@ import tk.plogitech.darksky.forecast.model.DailyDataPoint;
 import java.time.LocalDate;
 
 class WeatherEntryComponent extends FlexLayout {
+    private final Label title;
     private final Div icon;
     private final Label temperatureHigh;
     private final Label temperatureLow;
+    private final int index;
     private Label summary;
-    private final LocalDate date;
+    private LocalDate date;
 
-    WeatherEntryComponent(int index, DailyDataPoint data) {
-        date = LocalDate.from(data.getTime().atZone(DateUtils.EUROPE_STOCKHOLM));
-        String day = StringUtils.capitalize(DateUtils.getDay(date, true, "EEEE"));
-
-        Label title = new Label(day);
+    WeatherEntryComponent(int index) {
+        this.index = index;
+        title = new Label("-");
         title.addClassNames("title");
 
         icon = new Div();
         icon.addClassNames("icon");
 
-        temperatureHigh = new Label();
+        temperatureHigh = new Label("-- °C");
         temperatureHigh.addClassNames("temperature", "high");
 
-        temperatureLow = new Label();
+        temperatureLow = new Label("-- °C");
         temperatureLow.addClassNames("temperature", "low");
 
         if (index == 0) {
-            summary = new Label();
+            summary = new Label("--");
             summary.addClassNames("summary");
         }
 
@@ -45,10 +45,8 @@ class WeatherEntryComponent extends FlexLayout {
             temperature.add(summary);
 
         add(title, icon, temperature);
-        addClassNames("layout", day.toLowerCase().replace(" ", "_"), "day" + index);
+        addClassNames("layout", "day" + index);
         setFlexGrow(1, icon);
-
-        update(data);
     }
 
     LocalDate getDate() {
@@ -56,6 +54,11 @@ class WeatherEntryComponent extends FlexLayout {
     }
 
     void update(DailyDataPoint data) {
+        date = LocalDate.from(data.getTime().atZone(DateUtils.EUROPE_STOCKHOLM));
+        String day = StringUtils.capitalize(DateUtils.getDay(date, index != 0, "EEEE"));
+
+        title.setText(day);
+
         temperatureHigh.setText(String.format("%.0f °C", data.getTemperatureHigh()));
         temperatureLow.setText(String.format("%.0f °C", data.getTemperatureLow()));
 

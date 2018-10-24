@@ -26,6 +26,8 @@ public class TemperatureService {
     private final Executor executor = Executors.newSingleThreadExecutor();
     private Map<String, List<Consumer<Double>>> listeners = new HashMap<>();
 
+    private Map<Integer, String> cache = new HashMap<>();
+
     @Autowired
     public TemperatureService(Environment environment, MqttService mqtt) {
         this.mqtt = mqtt;
@@ -58,22 +60,32 @@ public class TemperatureService {
     public void subscribe() {
         subscribers = temperatureIds
                 .keySet().stream()
-                .map(id -> mqtt.subscribe(getTopicName(id), value -> publish(id, value)))
+                .map(id -> mqtt.subscribe(getTopicName(id), value -> publish(id, value, true)))
                 .collect(Collectors.toList());
+
+        publishCache();
+    }
+
+    private synchronized void publishCache() {
+        cache.forEach((key, value) -> publish(key, value, false));
     }
 
     @SuppressWarnings("CodeBlock2Expr")
-    private synchronized void publish(Integer id, String value) {
+    private synchronized void publish(Integer id, String value, boolean cache) {
         try {
             Double temperature = Double.parseDouble(value);
 
             Optional.ofNullable(temperatureIds.get(id))
                     .ifPresent(name -> {
                         listeners.getOrDefault(name, new ArrayList<>())
-                                .forEach(listener -> {
-                                    executor.execute(() -> listener.accept(temperature));
-                                });
+                                 .forEach(listener -> {
+                                     executor.execute(() -> listener.accept(temperature));
+                                 });
                     });
+
+            if (cache) {
+                this.cache.put(id, value);
+            }
         } catch (NumberFormatException e) {
             logger.error("Unable to parse value '" + value + "' as double for id " + id);
         }

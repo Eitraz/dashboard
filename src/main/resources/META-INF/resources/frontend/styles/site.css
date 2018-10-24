@@ -78,7 +78,8 @@ body {
 }
 
 .dashboard .vardagsrum {
-    background-image: url(https://images2.roomstogo.com/is/image/roomstogo/lr_rm_bonitasprings_gray_7pc_tx~Bonita-Springs-Gray-5-Pc-Living-Room.jpeg?$pdp_gallery_945$);
+    /*background-image: url(https://images2.roomstogo.com/is/image/roomstogo/lr_rm_bonitasprings_gray_7pc_tx~Bonita-Springs-Gray-5-Pc-Living-Room.jpeg?$pdp_gallery_945$);*/
+    background-image: url(../images/livingroom.jpg);
 }
 
 .dashboard .altan {
