@@ -1,11 +1,11 @@
 package com.eitraz.dashboard.service.ica;
 
+import com.eitraz.dashboard.service.AccountBalance;
 import com.eitraz.dashboard.service.ica.model.Account;
 import com.eitraz.dashboard.service.ica.model.LoginResponse;
 import com.eitraz.dashboard.service.ica.model.MinaSidorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AtomicDouble;
-import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -29,12 +30,13 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.util.Base64.getEncoder;
 
-@SpringComponent
-public class IcaBankenComponent {
-    private static final Logger logger = LoggerFactory.getLogger(IcaBankenComponent.class);
+@Service
+public class IcaBankenService {
+    private static final Logger logger = LoggerFactory.getLogger(IcaBankenService.class);
     private static final String BASE_URL = "https://api.ica.se/api/";
 
     @Value("${ica.banken.username}")
@@ -47,16 +49,21 @@ public class IcaBankenComponent {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private final MeterRegistry registry;
+
+    // id -> balance (also act as lock for metrics and accountNames)
     private final Map<String, AtomicDouble> metrics = new HashMap<>();
 
+    // id -> name
+    private final Map<String, String> accountNames = new HashMap<>();
+
     @Autowired
-    public IcaBankenComponent(MeterRegistry registry) {
+    public IcaBankenService(MeterRegistry registry) {
         this.registry = registry;
     }
 
     @PostConstruct
     public void init() {
-        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 0, 30, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 0, 15, TimeUnit.MINUTES);
     }
 
     private void updateAccounts() {
@@ -98,6 +105,8 @@ public class IcaBankenComponent {
                 balance = registry.gauge("economy_account", tags, new AtomicDouble(account.getAvailableAmount()));
                 metrics.put(id, balance);
             }
+
+            accountNames.put(id, account.getName());
         }
     }
 
@@ -185,6 +194,21 @@ public class IcaBankenComponent {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+    }
+
+    public List<AccountBalance> getAccountsBalance() {
+        synchronized (metrics) {
+            return accountNames
+                    .entrySet().stream()
+                    .filter(entry -> metrics.containsKey(entry.getKey()))
+                    .map(entry -> new AccountBalance(
+                            entry.getKey(),
+                            entry.getValue(),
+                            metrics.getOrDefault(entry.getKey(), new AtomicDouble(0))
+                                   .doubleValue()
+                    ))
+                    .collect(Collectors.toList());
         }
     }
 }
