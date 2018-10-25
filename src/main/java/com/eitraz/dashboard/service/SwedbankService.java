@@ -56,10 +56,12 @@ public class SwedbankService {
 
     @PostConstruct
     public void init() {
-        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 5, 10, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 0, 10, TimeUnit.MINUTES);
     }
 
     private boolean updateAccounts() {
+        logger.info("Update accounts");
+
         synchronized (lock) {
             try {
                 if (isLoggedIn()) {
