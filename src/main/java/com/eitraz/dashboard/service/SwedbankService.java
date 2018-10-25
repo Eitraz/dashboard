@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +40,10 @@ public class SwedbankService {
     @Autowired
     public SwedbankService(MeterRegistry registry) {
         this.registry = registry;
+    }
 
+    @PostConstruct
+    public void init() {
         // TODO: Needed?
         // Update metrics at a scheduled interval
         scheduledExecutorService.scheduleWithFixedDelay(() -> {
@@ -68,9 +72,7 @@ public class SwedbankService {
                     List<TransactionAccount> accounts = accountList.getAllAccounts();
 
                     // Register metrics
-                    synchronized (metrics) {
-                        accounts.forEach(account -> registerMetrics(accountList, account));
-                    }
+                    accounts.forEach(account -> registerMetrics(accountList, account));
 
                     listener.accept(accounts);
 
