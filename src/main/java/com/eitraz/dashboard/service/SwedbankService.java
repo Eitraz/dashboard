@@ -56,7 +56,7 @@ public class SwedbankService {
 
     @PostConstruct
     public void init() {
-        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 0, 10, TimeUnit.MINUTES);
+//        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 0, 10, TimeUnit.MINUTES);
     }
 
     private boolean updateAccounts() {
@@ -72,17 +72,20 @@ public class SwedbankService {
                         return true;
                     }
 
-                    lastUpdateAccountsTime = now;
+                    // TODO: Disable temporary until schedule update is fixed
+                    //lastUpdateAccountsTime = now;
 
                     logger.info("Fetching accounts");
 
                     AccountList accountList = swedbank.accountList();
                     List<TransactionAccount> accounts = accountList.getAllAccounts();
-
                     logger.info("Accounts fetched, registering metrics");
 
                     // Register metrics
                     accounts.forEach(account -> registerMetrics(accountList, account));
+
+                    // Need to log out for data to be refreshed? TODO: Look into this
+                    swedbank = null;
 
                     return true;
                 } else {
