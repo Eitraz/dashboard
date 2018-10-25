@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,16 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Service
 public class SwedbankService {
     private static final Logger logger = LoggerFactory.getLogger(SwedbankService.class);
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private final MeterRegistry registry;
@@ -42,23 +37,11 @@ public class SwedbankService {
         this.registry = registry;
     }
 
-    @PostConstruct
-    public void init() {
-        // TODO: Needed?
-        // Update metrics at a scheduled interval
-        scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            synchronized (metrics) {
-                metrics.values().forEach(value -> value.set(value.get()));
-            }
-        }, 30, 30, TimeUnit.SECONDS);
-    }
-
     public Task getAccounts(String personalNumber, Consumer<List<TransactionAccount>> listener) {
         Swedbank swedbank = new Swedbank();
         MobileBankID mobileBankID = new MobileBankID(new SwedbankApp(), personalNumber);
 
         Task task = new GetAccountsTask();
-
         executorService.execute(() -> {
             try {
                 swedbank.login(mobileBankID);
