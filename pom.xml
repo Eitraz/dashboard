@@ -94,6 +94,14 @@
             <version>1.14</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -102,11 +110,22 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.github.soshibby/swedbank -->
         <dependency>
-            <groupId>com.github.soshibby</groupId>
-            <artifactId>swedbank</artifactId>
-            <version>1.2.1</version>
+            <groupId>com.github.eitraz</groupId>
+            <artifactId>avanza-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.eitraz</groupId>
+            <artifactId>ica-banken-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.eitraz</groupId>
+            <artifactId>swedbank-api</artifactId>
+            <version>1.0</version>
         </dependency>
 
     </dependencies>

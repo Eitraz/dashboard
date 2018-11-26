@@ -1,0 +1,20 @@
+.surveillance {
+
+}
+
+.camera {
+    flex-flow: column;
+    /*flex-flow: row wrap;*/
+    background-color: var(--lumo-primary-color-10pct);
+    padding: var(--lumo-space-s);
+}
+
+.camera > img {
+    width: 100%;
+}
+
+@media all and (min-width: 800px) {
+    .surveillance .card {
+        flex: 1 50%;
+    }
+}
