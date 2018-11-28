@@ -40,7 +40,7 @@ public class SwedbankLoginDialog extends Dialog {
     private final SwedbankService swedbank;
     private final MobileBankId mobileBankId = new MobileBankId(BankType.SWEDBANK);
 
-    private final List<Runnable> listeners = new ArrayList<>();
+    private final List<Runnable> accountsUpdatedListeners = new ArrayList<>();
 
     @Autowired
     public SwedbankLoginDialog(SwedbankService swedbank, @Value("${economy.usernames}") String usernames) {
@@ -73,11 +73,11 @@ public class SwedbankLoginDialog extends Dialog {
     }
 
     public synchronized EventPublisher.EventRegistration registerAccountsUpdatedListener(Runnable listener) {
-        listeners.add(listener);
+        accountsUpdatedListeners.add(listener);
 
         return () -> {
             synchronized (EventPublisher.EventRegistration.class) {
-                listeners.remove(listener);
+                accountsUpdatedListeners.remove(listener);
             }
         };
     }
@@ -119,22 +119,16 @@ public class SwedbankLoginDialog extends Dialog {
             ui.access(updateAccountsDialog::open);
 
             try {
-                this.swedbank.updateAccounts(api);
+                this.swedbank.login(api);
+                this.swedbank.updateAccounts();
 
                 // Notify listeners
-                listeners.forEach(Runnable::run);
+                accountsUpdatedListeners.forEach(Runnable::run);
             } catch (Throwable e) {
                 logger.error("Error while updating accounts", e);
                 ui.access(() -> showErrorDialog("Error while updating accounts: " + e.getMessage()));
             } finally {
                 ui.access(updateAccountsDialog::close);
-
-                // Log out Swedbank API
-                try {
-                    api.logout();
-                } catch (Throwable e) {
-                    logger.error("Error while logging out", e);
-                }
             }
         });
     }
@@ -151,10 +145,7 @@ public class SwedbankLoginDialog extends Dialog {
             progressBar.setIndeterminate(true);
 
             // Cancel button
-            Button cancelButton = new Button("Cancel", event -> {
-//            loginTask.abort();
-                LoginWithMobileBankId.this.close();
-            });
+            Button cancelButton = new Button("Cancel", event -> LoginWithMobileBankId.this.close());
 
             VerticalLayout layout = new VerticalLayout(label, progressBar, cancelButton);
             layout.setWidth("100%");

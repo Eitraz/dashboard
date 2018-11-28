@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.Duration;
 import java.util.concurrent.*;
 
 @Service
@@ -36,6 +37,9 @@ public class AvanzaService extends AbstractAccountService {
                 waitingForTotp = false;
             }
         });
+
+        // Don't persist to often
+        setPersistInterval(Duration.ofHours(1));
     }
 
     public boolean isWaitingForTotp() {
@@ -57,7 +61,7 @@ public class AvanzaService extends AbstractAccountService {
                   .getAccounts()
                   .forEach(account -> registerMetrics(accountToAccountDetails(account)));
         } catch (RuntimeException e) {
-            logger.error("Unable to get accounts");
+            logger.error("Unable to get accounts", e);
         }
     }
 

@@ -10,6 +10,7 @@ import com.eitraz.dashboard.service.SwedbankService;
 import com.eitraz.dashboard.util.EventPublisher;
 import com.eitraz.dashboard.view.component.economy.AvanzaTotpDialog;
 import com.eitraz.dashboard.view.component.economy.EconomyCard;
+import com.eitraz.dashboard.view.component.economy.PasswordLoginDialog;
 import com.eitraz.dashboard.view.component.economy.SwedbankLoginDialog;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
@@ -87,14 +88,29 @@ public class EconomyView extends FlexLayout {
             // Open Swedbank Login on close
             avanzaTotpDialog.addOpenedChangeListener(event -> {
                 if (!event.isOpened()) {
-                    ui.access(swedbankLoginDialog::open);
+                    // Open Swedbank Login
+                    if (!swedbank.isLoggedIn()) {
+                        ui.access(swedbankLoginDialog::open);
+                    }
+                    // Use password
+                    else {
+                        loginUsingPassword(ui);
+                    }
                 }
             });
         }
         // Open Swedbank Login
-        else {
+        else if (!swedbank.isLoggedIn()) {
             swedbankLoginDialog.open();
         }
+        // Use password
+        else {
+            loginUsingPassword(ui);
+        }
+    }
+
+    private void loginUsingPassword(UI ui) {
+        new PasswordLoginDialog(password, () -> updateAccounts(ui)).open();
     }
 
     @Override
