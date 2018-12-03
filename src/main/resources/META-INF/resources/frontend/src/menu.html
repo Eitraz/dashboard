@@ -1,8 +1,9 @@
-<dom-module id="my-vaadin-menu-tab" theme-for="vaadin-tab">
+<dom-module id="my-vaadin-button" theme-for="vaadin-button">
     <template>
         <style>
-            :host([selected])::before {
-                background-color: white;
+            :host([theme~="primary"]) {
+                min-width: 0;
+                padding: 0;
             }
         </style>
     </template>

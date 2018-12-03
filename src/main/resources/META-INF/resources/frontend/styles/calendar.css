@@ -1,23 +1,54 @@
-.calendar .petter {
-    border-left: #4754b2 8px solid;
+.calendar {
+    /*flex-flow: column;*/
+    flex-flow: row wrap;
+    background-color: var(--lumo-primary-color-10pct);
 }
 
-.calendar .anki {
-    border-left: #cd8274 8px solid;
+.calendar > * {
+    flex: 1 100%;
 }
 
-.calendar .linn {
-    border-left: #7a37a7 8px solid;
+.calendar .event {
+    /*flex-flow: row nowrap;*/
+    /*align-items: center;*/
+    flex-flow: column;
+    margin: var(--lumo-space-xs);
 }
 
-.calendar .isak {
-    border-left: #6fb079 8px solid;
+.calendar .event > * {
+    box-sizing: border-box;
+    padding: var(--lumo-space-s);
 }
 
-.calendar .other {
-    border-left: #4a7c46 8px solid;
+.calendar .event .date {
+    padding-bottom: 0;
+    font-style: italic;
 }
 
-.calendar .date_container {
-    width: 100%;
+.calendar .event .label {
+    padding-top: 0;
+}
+
+.calendar .event:nth-child(2n) {
+    background-color: var(--lumo-primary-color-10pct);
+}
+
+.calendar .event.petter {
+    border-left: var(--lumo-space-xs) solid #4754b2;
+}
+
+.calendar .event.anki {
+    border-left: var(--lumo-space-xs) solid #cd8274;
+}
+
+.calendar .event.linn {
+    border-left: var(--lumo-space-xs) solid #7a37a7;
+}
+
+.calendar .event.isak {
+    border-left: var(--lumo-space-xs) solid #6fb079;
+}
+
+.calendar .event.other {
+    border-left: var(--lumo-space-xs) solid #4a7c46;
 }

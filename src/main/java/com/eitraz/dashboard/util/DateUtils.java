@@ -1,5 +1,7 @@
 package com.eitraz.dashboard.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,7 +40,7 @@ public final class DateUtils {
         }
         // Date
         else {
-            return date.format(DateTimeFormatter.ofPattern(fallbackFormat, SWEDEN));
+            return StringUtils.capitalize(date.format(DateTimeFormatter.ofPattern(fallbackFormat, SWEDEN)));
         }
     }
 
@@ -48,8 +50,4 @@ public final class DateUtils {
 
         return startTime + ((endTime != null) ? (" - " + endTime) : "");
     }
-
-//    public static String getDayAndTime(LocalDateTime start, LocalDateTime end) {
-//
-//    }
 }

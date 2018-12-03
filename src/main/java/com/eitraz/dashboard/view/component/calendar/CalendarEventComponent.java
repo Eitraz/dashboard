@@ -1,12 +1,11 @@
-package com.eitraz.dashboard.view.component;
+package com.eitraz.dashboard.view.component.calendar;
 
+import com.eitraz.dashboard.component.FlexLayout;
+import com.eitraz.dashboard.component.Label;
 import com.eitraz.dashboard.service.GoogleCalendarService;
 import com.eitraz.dashboard.util.DateUtils;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,23 +14,22 @@ import java.time.LocalDateTime;
 import static com.eitraz.dashboard.util.DateUtils.EUROPE_STOCKHOLM;
 import static com.eitraz.dashboard.util.DateUtils.getTime;
 
-class CalendarEventComponent extends HorizontalLayout {
-    private GoogleCalendarService.CalendarEvent calendarEvent;
+public class CalendarEventComponent extends FlexLayout {
+    private final boolean displayDate = true;
+    private final Label dateLabel;
     private final Label label;
-    private final boolean displayDate;
-    private final int maxWidth;
 
-    CalendarEventComponent(GoogleCalendarService.CalendarEvent calendarEvent) {
-        this(calendarEvent, true, 72);
-    }
+    private GoogleCalendarService.CalendarEvent calendarEvent;
 
-    CalendarEventComponent(GoogleCalendarService.CalendarEvent calendarEvent, boolean displayDate, int maxWidth) {
-        this.calendarEvent = calendarEvent;
-        this.displayDate = displayDate;
-        this.maxWidth = maxWidth;
+    public CalendarEventComponent(GoogleCalendarService.CalendarEvent calendarEvent) {
+        setCalendarEvent(calendarEvent);
 
-        label = new Label();
-        add(label);
+        dateLabel = new Label().withClassNames("date", "text-xs");
+        label = new Label().withClassNames("label", "text");
+
+        add(dateLabel, label);
+
+        setClassName("event");
     }
 
     GoogleCalendarService.CalendarEvent getCalendarEvent() {
@@ -42,7 +40,7 @@ class CalendarEventComponent extends HorizontalLayout {
         this.calendarEvent = calendarEvent;
     }
 
-    void update() {
+    public void update() {
         String calendarId = calendarEvent.getCalendarId();
         Event event = calendarEvent.getEvent();
 
@@ -59,7 +57,7 @@ class CalendarEventComponent extends HorizontalLayout {
 
         // Date only
         if (startTime.isDateOnly()) {
-            time = displayDate ? (DateUtils.getDay(date) + " - ") : "";
+            time = displayDate ? (DateUtils.getDay(date)) : "";
         }
         // Date and time
         else {
@@ -86,7 +84,6 @@ class CalendarEventComponent extends HorizontalLayout {
             else {
                 time = getTime(startDateTime, endDateTime);
             }
-            time += " - ";
         }
 
         // Category
@@ -97,10 +94,11 @@ class CalendarEventComponent extends HorizontalLayout {
             category = "other";
         }
 
-        setClassName("entry");
+        setClassName("event");
         addClassNames(category);
 
         // Update text
-        label.setText(StringUtils.abbreviate(time + summary, maxWidth));
+        dateLabel.setText(time);
+        label.setText(summary);
     }
 }

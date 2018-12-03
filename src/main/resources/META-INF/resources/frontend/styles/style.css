@@ -1,0 +1,99 @@
+html {
+    background-color: hsl(214, 35%, 21%);
+}
+
+body {
+    /*display: flex;*/
+    height: 100%;
+}
+
+.layout {
+    /*flex: 1 auto;*/
+    flex-direction: column;
+}
+
+.text {
+    font-size: var(--lumo-font-size-m);
+}
+
+.text-s {
+    font-size: var(--lumo-font-size-s);
+}
+
+.text-xs {
+    font-size: var(--lumo-font-size-xs);
+}
+
+@media all and (min-width: 800px) {
+    .text {
+        font-size: var(--lumo-font-size-xl);
+    }
+
+    .text-s {
+        font-size: var(--lumo-font-size-l);
+    }
+
+    .text-xs {
+        font-size: var(--lumo-font-size-s);
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------- */
+/* Menu */
+/*------------------------------------------------------------------------------------------------------------------- */
+.menu {
+    margin: var(--lumo-space-s);
+    margin-bottom: 0;
+    flex-flow: row nowrap;
+    box-sizing: border-box;
+}
+
+.menu .button {
+    flex: 1 auto;
+}
+
+/*------------------------------------------------------------------------------------------------------------------- */
+/* Content */
+/*------------------------------------------------------------------------------------------------------------------- */
+.content {
+    flex: 1 auto;
+    flex-direction: column;
+}
+
+/*------------------------------------------------------------------------------------------------------------------- */
+/* Card */
+/*------------------------------------------------------------------------------------------------------------------- */
+.card {
+    flex-flow: column;
+    margin-top: var(--lumo-space-s);
+}
+
+.card .header {
+    flex-flow: row nowrap;
+    background-color: var(--lumo-primary-color);
+}
+
+.card .header > * {
+    padding: var(--lumo-space-s);
+}
+
+.card .header .icon {
+}
+
+.card .header .title {
+}
+
+/*------------------------------------------------------------------------------------------------------------------- */
+/* Dashboard */
+/*------------------------------------------------------------------------------------------------------------------- */
+.dashboard {
+    /*flex: 1 auto;*/
+    margin: var(--lumo-space-s);
+    margin-top: 0;
+
+    flex-flow: row wrap;
+}
+
+.dashboard > * {
+    flex: 1 100%;
+}

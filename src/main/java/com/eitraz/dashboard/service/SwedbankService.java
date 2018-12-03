@@ -1,204 +1,115 @@
 package com.eitraz.dashboard.service;
 
-import com.github.soshibby.swedbank.Swedbank;
-import com.github.soshibby.swedbank.app.SwedbankApp;
-import com.github.soshibby.swedbank.authentication.MobileBankID;
-import com.github.soshibby.swedbank.exceptions.SwedbankAuthenticationException;
-import com.github.soshibby.swedbank.types.AccountList;
-import com.github.soshibby.swedbank.types.TransactionAccount;
-import com.google.common.util.concurrent.AtomicDouble;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import org.apache.commons.codec.digest.DigestUtils;
+import com.github.eitraz.swedbank.SwedbankApi;
+import com.github.eitraz.swedbank.exception.SwedbankApiException;
+import com.github.eitraz.swedbank.exception.SwedbankClientException;
+import com.github.eitraz.swedbank.model.engagement.Overview;
+import com.github.eitraz.swedbank.model.engagement.TransactionAccount;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.text.Normalizer;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Service
-public class SwedbankService {
+public class SwedbankService extends AbstractAccountService {
     private static final Logger logger = LoggerFactory.getLogger(SwedbankService.class);
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private final MeterRegistry registry;
-
-    // id -> balance (also act as lock for metrics and accountNames)
-    private final Map<String, AtomicDouble> metrics = new HashMap<>();
-
-    // id -> name
-    private final Map<String, String> accountNames = new HashMap<>();
-
-    private final String lock = "lock";
-    private Swedbank swedbank;
-
     private LocalDateTime lastUpdateAccountsTime = LocalDateTime.now().minusDays(1);
 
-    @Autowired
-    public SwedbankService(MeterRegistry registry) {
-        this.registry = registry;
-    }
+    private SwedbankApi swedbank = null;
 
     @PostConstruct
     public void init() {
-//        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 0, 10, TimeUnit.MINUTES);
+        // Schedule update
+        scheduledExecutorService.scheduleWithFixedDelay(this::updateAccounts, 5, 10, TimeUnit.MINUTES);
     }
 
-    private boolean updateAccounts() {
-        logger.info("Update accounts");
+    public void updateAccounts() {
+        if (!isLoggedIn()) {
+            logger.debug("Not logged in, won't update accounts");
+            return;
+        }
 
-        synchronized (lock) {
-            try {
-                if (isLoggedIn()) {
-                    LocalDateTime now = LocalDateTime.now();
-                    // No need to fetch to often
-                    if (now.isBefore(lastUpdateAccountsTime.plusMinutes(5))) {
-                        logger.info("No need to fetch accounts");
-                        return true;
-                    }
+        LocalDateTime now = LocalDateTime.now();
+        // No need to fetch to often
+        if (now.isBefore(lastUpdateAccountsTime.plusMinutes(5))) {
+            logger.info("No need to fetch accounts");
+            return;
+        }
 
-                    // TODO: Disable temporary until schedule update is fixed
-                    //lastUpdateAccountsTime = now;
+        logger.info("Fetching overview");
 
-                    logger.info("Fetching accounts");
+        try {
+            Overview overview = swedbank.getOverview();
 
-                    AccountList accountList = swedbank.accountList();
-                    List<TransactionAccount> accounts = accountList.getAllAccounts();
-                    logger.info("Accounts fetched, registering metrics");
+            // Accounts
+            List<TransactionAccount> accounts = new ArrayList<>();
+            accounts.addAll(overview.getTransactionAccounts());
+            accounts.addAll(overview.getLoanAccounts());
+            accounts.addAll(overview.getSavingAccounts());
+            accounts.addAll(overview.getTransactionDisposalAccounts());
 
-                    // Register metrics
-                    accounts.forEach(account -> registerMetrics(accountList, account));
+            logger.info("Accounts fetched, registering metrics");
 
-                    // Need to log out for data to be refreshed? TODO: Look into this
-                    swedbank = null;
+            // Get account details and register metrics
+            accounts.stream()
+                    .map(transactionAccount -> getAccountDetails(overview, transactionAccount))
+                    .forEach(this::registerMetrics);
 
-                    return true;
-                } else {
-                    logger.info("Not logged in, won't fetch accounts");
-                    return false;
-                }
-            } catch (Throwable e) {
-                logger.error("Error while fetching accounts", e);
-                swedbank = null;
-                return false;
+            lastUpdateAccountsTime = LocalDateTime.now();
+        } catch (Throwable e) {
+            logger.error("Error while fetching accounts", e);
+            swedbank = null;
+        }
+    }
+
+    private AccountDetails getAccountDetails(Overview overview, TransactionAccount transactionAccount) {
+        try {
+            // Fetch details
+            if (transactionAccount.getDetails() != null) {
+                com.github.eitraz.swedbank.model.engagement.account.AccountDetails details = swedbank.getAccountDetails(transactionAccount);
+
+                return new AccountDetails()
+                        .setId(details.getFullyFormattedNumber())
+                        .setName(Optional.ofNullable(StringUtils.trimToNull(details.getName().getCurrent()))
+                                         .orElse(transactionAccount.getName()))
+                        .setType(getAccountType(overview, transactionAccount))
+                        .setBalance(details.getAvailableAmount().getAmount());
             }
-        }
-    }
-
-    public boolean isLoggedIn() {
-        synchronized (lock) {
-            try {
-                return swedbank != null && swedbank.isLoggedIn();
-            } catch (SwedbankAuthenticationException e) {
-                return false;
-            }
-        }
-    }
-
-    public Task loginWithBankId(String personalNumber, Runnable loggedIn, Consumer<String> failed) {
-        synchronized (lock) {
-            swedbank = new Swedbank();
-            MobileBankID mobileBankID = new MobileBankID(new SwedbankApp(), personalNumber);
-
-            Task task = new LoginTask();
-            executorService.execute(() -> {
-                try {
-                    swedbank.login(mobileBankID);
-
-                    while (!task.isAborted() && !swedbank.isLoggedIn()) {
-                        Thread.sleep(5000);
-                    }
-
-                    // Force update accounts
-                    if (!task.isAborted()) {
-                        loggedIn.run();
-                    }
-                } catch (Throwable e) {
-                    logger.error("Failed to login", e);
-                    failed.accept("Failed to login");
-                }
-            });
-            return task;
-        }
-    }
-
-    public void getAccountsBalance(Consumer<List<AccountBalance>> consumer, Consumer<String> failed) {
-        if (isLoggedIn()) {
-            executorService.execute(() -> {
-                if (updateAccounts()) {
-                    synchronized (metrics) {
-                        List<AccountBalance> accountBalance = accountNames
-                                .entrySet().stream()
-                                .filter(entry -> metrics.containsKey(entry.getKey()))
-                                .map(entry -> new AccountBalance(
-                                        entry.getKey(),
-                                        entry.getValue(),
-                                        metrics.getOrDefault(entry.getKey(), new AtomicDouble(0))
-                                               .doubleValue()
-                                ))
-                                .collect(Collectors.toList());
-                        consumer.accept(accountBalance);
-                    }
-                }
-                // Failed
-                else {
-                    failed.accept("Failed to update accounts");
-                }
-            });
-        } else {
-            failed.accept("Not logged in");
-        }
-    }
-
-    private void registerMetrics(AccountList accountList, TransactionAccount account) {
-        String id = DigestUtils.md5Hex(account.getFullyFormattedNumber());
-
-        synchronized (metrics) {
-            AtomicDouble balance = metrics.get(id);
-
-            // Update
-            if (balance != null) {
-                balance.set(account.getBalance());
-            }
-            // Create new
+            // Get details from overview
             else {
-                String tag = Normalizer
-                        .normalize(account.getName(), Normalizer.Form.NFKD)
-                        .replaceAll("\\p{M}", "")
-                        .replace(" ", "_")
-                        .replace("-", "_")
-                        .toLowerCase();
-
-                List<Tag> tags = Arrays.asList(
-                        Tag.of("id", id),
-                        Tag.of("tag", tag),
-                        Tag.of("name", account.getName()),
-                        Tag.of("type", getAccountType(accountList, account)));
-
-                balance = registry.gauge("economy_account", tags, new AtomicDouble(account.getBalance()));
-                metrics.put(id, balance);
+                return new AccountDetails()
+                        .setId(transactionAccount.getFullyFormattedNumber())
+                        .setName(transactionAccount.getName())
+                        .setType(getAccountType(overview, transactionAccount))
+                        .setBalance(transactionAccount.getBalance());
             }
 
-            accountNames.put(id, account.getName());
+        } catch (SwedbankClientException | SwedbankApiException e) {
+            throw new RuntimeException("Failed to fetch transactions", e);
         }
     }
 
-    private String getAccountType(AccountList accountList, TransactionAccount account) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isLoggedIn() {
+        return swedbank != null;
+    }
+
+    public void login(SwedbankApi swedbankApi) {
+        this.swedbank = swedbankApi;
+    }
+
+    private String getAccountType(Overview accountList, TransactionAccount account) {
         // Transaction
         if (contains(accountList.getTransactionAccounts(), account)) {
             return "transaction";
@@ -227,27 +138,6 @@ public class SwedbankService {
 
     private boolean contains(List<TransactionAccount> accounts, TransactionAccount account) {
         return accounts.stream().anyMatch(a -> a.getId().equals(account.getId()));
-    }
-
-    public interface Task {
-        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-        boolean isAborted();
-
-        void abort();
-    }
-
-    public class LoginTask implements Task {
-        private boolean aborted = false;
-
-        @Override
-        public boolean isAborted() {
-            return aborted;
-        }
-
-        @Override
-        public void abort() {
-            this.aborted = true;
-        }
     }
 
 }

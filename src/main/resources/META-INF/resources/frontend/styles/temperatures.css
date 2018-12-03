@@ -1,0 +1,103 @@
+.temperatures {
+    /*flex-flow: column;*/
+    flex-flow: row wrap;
+}
+
+.temperatures > * {
+    flex: 1 100%;
+}
+
+.temperature {
+    flex-flow: row nowrap;
+    align-items: center;
+    background-color: var(--lumo-primary-color-10pct);
+}
+
+.temperature > * {
+    box-sizing: border-box;
+    padding: var(--lumo-space-s);
+}
+
+.temperature .title {
+    flex: 0 1 auto;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 140px;
+}
+
+.temperature .value {
+    flex: 0 1 auto;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 85px;
+    text-align: right;
+}
+
+.temperature .bar_container {
+    flex: 1 auto;
+}
+
+.temperature .bar {
+    flex: 1 auto;
+    border-radius: var(--lumo-border-radius);
+}
+
+.temperature .bar .minus {
+    background-color: var(--lumo-error-color-10pct);
+    position: relative;
+    z-index: auto;
+}
+
+.temperature .bar .minus:before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    top: -5px;
+    bottom: -5px;
+    border-left: 1px solid var(--lumo-primary-color);
+}
+
+.temperature .bar .minus_value {
+    float: right;
+    background-color: var(--lumo-error-color);
+    height: calc(var(--lumo-size-l) / 10);
+}
+
+.temperature .bar .plus {
+    background-color: var(--lumo-contrast-10pct);
+}
+
+.temperature .bar .plus_value {
+    background-color: var(--lumo-primary-color);
+    height: calc(var(--lumo-size-l) / 10);
+}
+
+@media all and (min-width: 800px) {
+    .temperature {
+        flex: 1 50%;
+        box-sizing: border-box;
+    }
+
+    .temperature:nth-child(2n + 1) {
+        border-right: calc(var(--lumo-space-s) / 2) solid var(--lumo-primary-color);
+    }
+
+    .temperature:nth-child(2n) {
+        border-left: calc(var(--lumo-space-s) / 2) solid var(--lumo-primary-color);
+    }
+
+    .temperature > * {
+        padding: var(--lumo-space-m);
+    }
+
+    .temperature .title {
+        width: 170px;
+    }
+
+    .temperature .value {
+        width: 120px;
+    }
+}

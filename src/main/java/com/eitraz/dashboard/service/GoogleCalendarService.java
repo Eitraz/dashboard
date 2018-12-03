@@ -35,7 +35,6 @@ public class GoogleCalendarService extends EventPublisher<List<GoogleCalendarSer
     private static final Logger logger = LoggerFactory.getLogger(GoogleCalendarService.class);
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
 
     @Value("${google.calendar.application.name}")
@@ -52,6 +51,9 @@ public class GoogleCalendarService extends EventPublisher<List<GoogleCalendarSer
 
     @Value("${google.calendar.updateDelayInMinutes}")
     private Integer updateDelayInMinutes;
+
+    @Value("${google.calendar.tokensDirectoryPath}")
+    private String tokensDirectoryPath;
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -132,7 +134,7 @@ public class GoogleCalendarService extends EventPublisher<List<GoogleCalendarSer
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(tokensDirectoryPath)))
                 .setAccessType("offline")
                 .build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
