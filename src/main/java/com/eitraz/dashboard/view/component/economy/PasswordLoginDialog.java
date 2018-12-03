@@ -27,12 +27,15 @@ public class PasswordLoginDialog extends Dialog {
         // Submit
         Button submitButton = new Button("Submit", event -> {
             if (password.equals(passwordField.getValue())) {
+                passwordField.setInvalid(false);
                 PasswordLoginDialog.this.close();
                 loginSuccessRunnable.run();
             }
-
-            passwordField.setErrorMessage("Invalid password");
-            passwordField.setInvalid(true);
+            // Show error message
+            else {
+                passwordField.setErrorMessage("Invalid password");
+                passwordField.setInvalid(true);
+            }
         });
         submitButton.withThemes("primary");
         submitButton.setWidth("50%");
