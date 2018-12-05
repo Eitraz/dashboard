@@ -25,7 +25,7 @@ public class MainMenu extends FlexLayout implements AfterNavigationObserver {
     private void init() {
         addMenuItem(Constants.PAGE_ROOT, VaadinIcon.HOME);
         addMenuItem(Constants.PAGE_CALENDAR, VaadinIcon.CALENDAR);
-        addMenuItem(Constants.PAGE_WEATHER, VaadinIcon.SUN_O);
+        addMenuItem(Constants.PAGE_WEATHER, VaadinIcon.CLOUD_O);
         addMenuItem(Constants.PAGE_ECONOMY, VaadinIcon.DOLLAR);
         addMenuItem(Constants.PAGE_SURVEILLANCE, VaadinIcon.CAMERA);
     }

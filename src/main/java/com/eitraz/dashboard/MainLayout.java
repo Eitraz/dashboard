@@ -18,7 +18,7 @@ import java.util.Objects;
 @StyleSheet("frontend://styles/style.css")
 @StyleSheet("frontend://styles/temperatures.css")
 @StyleSheet("frontend://styles/calendar.css")
-@StyleSheet("frontend://styles/economy.css")
+//@StyleSheet("frontend://styles/economy.css")
 @StyleSheet("frontend://styles/surveillance.css")
 @HtmlImport("frontend://src/lumo.html")
 @Theme(value = Lumo.class, variant = Lumo.DARK)

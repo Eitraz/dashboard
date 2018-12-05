@@ -1,12 +1,12 @@
 package com.eitraz.dashboard.view.component;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 
 public class CardComponent extends FlexLayout {
-    public CardComponent(Icon icon, String title, Component content) {
+    public CardComponent(Component icon, String title, Component content) {
         // Title
         Label titleLabel = new Label(title);
         titleLabel.addClassNames("title", "text");
@@ -16,7 +16,9 @@ public class CardComponent extends FlexLayout {
 
         // Icon
         if (icon != null) {
-            icon.addClassName("icon");
+            if (icon instanceof HasStyle) {
+                ((HasStyle) icon).addClassName("icon");
+            }
             header.add(icon);
         }
 
