@@ -113,3 +113,19 @@ body {
 .dashboard > * {
     flex: 1 100%;
 }
+
+.dashboard .columns {
+    flex-flow: row wrap;
+    box-sizing: border-box;
+}
+
+.dashboard .columns > * {
+    flex: 1 100%;
+    box-sizing: border-box;
+}
+
+@media all and (min-width: 800px) {
+    .dashboard .columns > * {
+        flex: 1 50%;
+    }
+}
