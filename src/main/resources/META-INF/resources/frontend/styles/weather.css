@@ -42,18 +42,18 @@
 }
 
 @media all and (max-width: 799px){
-    .weather .details:nth-child(2n) {
+    .weather_view .weather .details:nth-child(2n) {
         background-color: var(--lumo-primary-color-10pct);
     }
 }
 
 @media all and (min-width: 800px) {
-    .weather .details {
+    .weather_view .weather .details {
         flex: 1 49%;
         box-sizing: border-box;
     }
 
-    .weather .details > * {
+    .weather_view .weather .details > * {
         box-sizing: border-box;
         padding: var(--lumo-space-m);
     }
@@ -62,11 +62,11 @@
         width: 125px;
     }
 
-    .weather .details:nth-child(4n) {
+    .weather_view .weather .details:nth-child(4n) {
         background-color: var(--lumo-primary-color-10pct);
     }
 
-    .weather .details:nth-child(4n + 1) {
+    .weather_view .weather .details:nth-child(4n + 1) {
         background-color: var(--lumo-primary-color-10pct);
     }
 }

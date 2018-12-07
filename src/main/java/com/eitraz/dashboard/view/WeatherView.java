@@ -14,7 +14,7 @@ public class WeatherView extends Div {
 
     @Autowired
     public WeatherView(DarkSkyService darkSky) {
-        setClassName("dashboard");
+        addClassNames("dashboard", "weather_view");
         add(new WeatherCard(darkSky));
     }
 }

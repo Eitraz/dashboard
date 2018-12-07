@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DashboardView extends FlexLayout {
     @Autowired
     public DashboardView(TemperatureService temperatureService, GoogleCalendarService googleCalendar, DarkSkyService darkSkyService) {
-        setClassName("dashboard");
+        addClassNames("dashboard", "dashboard_view");
 
         add(new TemperaturesCard(temperatureService));
 
