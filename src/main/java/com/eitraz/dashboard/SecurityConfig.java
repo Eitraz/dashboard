@@ -10,10 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Value("${server.username")
+    @Value("${server.username}")
     private String username;
 
-    @Value("${server.password")
+    @Value("${server.password}")
     private String password;
 
     private final CustomAuthenticationEntryPoint entryPoint;
@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser(username)
-                .password(password)
+                .password("{noop}" + password)
                 .roles("USER");
     }
 }
